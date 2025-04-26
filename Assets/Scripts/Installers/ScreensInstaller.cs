@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 
@@ -11,11 +10,14 @@ public class ScreensInstaller : MonoInstaller
     [SerializeField]
     private InitialView initialView;
     
+    [SerializeField]
+    private LobbyView lobbyView;
     
     public override void InstallBindings()
     {
         BindInitialConnect();
         BindLogin();
+        BindLobby();
     }
     private void BindLogin()
     {
@@ -27,6 +29,11 @@ public class ScreensInstaller : MonoInstaller
     {
         Container.Bind<InitialView>().FromInstance(initialView).AsSingle();
         Container.Bind<InitialPresenter>().AsSingle().NonLazy();
+    }
+    private void BindLobby()
+    {
+        Container.Bind<LobbyView>().FromInstance(lobbyView).AsSingle();
+        Container.Bind<LobbyPresenter>().AsSingle().NonLazy();
     }
 
     
