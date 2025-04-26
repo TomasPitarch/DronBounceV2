@@ -44,6 +44,6 @@ public class LoginPresenter
     {
         //TODO:Move out of here, implement a non generic nickname and
         // use the navigator instead of a change of scene
-        _navigator.OpenScreen("Teampiker");
+        _navigator.OpenScreen("Lobby");
     }
 }
