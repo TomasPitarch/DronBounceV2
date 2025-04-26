@@ -1113,12 +1113,12 @@ GameObject:
   - component: {fileID: 1913085960142457223}
   - component: {fileID: 188586520482067284}
   m_Layer: 0
-  m_Name: Loggin View
+  m_Name: Login View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1913085960142457223
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1153,7 +1153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e6b55510ec9a62409d605bcdf5527bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenId: Loggin
+  screenId: Login
   connectButton: {fileID: 514374210227451847}
   textNickName: {fileID: 8495406139367152946}
   roomName: {fileID: 3131499723810635958}
