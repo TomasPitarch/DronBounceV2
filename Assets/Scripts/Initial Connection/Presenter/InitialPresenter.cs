@@ -24,7 +24,7 @@ public class InitialPresenter
 
     private void HandleConnectButtonClicked()
     {
-        TryConnect();
+        TryConnect().Forget();
     }
     private async UniTask TryConnect()
     {
