@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e28d3c41eada94db660483243e2115, type: 3}
+  m_Name: Gameplay effects
+  m_EditorClassIdentifier: 
+  AudioClips:
+  - Id: ball_bounce
+    AudioClip: {fileID: 8300000, guid: 3a55f2fe2146e6141a85cba49f56c63c, type: 3}
+  - Id: score
+    AudioClip: {fileID: 8300000, guid: ab0bf9106cdd0734a879e4e01f5ea008, type: 3}

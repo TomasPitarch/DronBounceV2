@@ -450,6 +450,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   S_OnPointerClick: 
   S_OnPointerDown: 
-  S_OnPointerEnter: Button Click
+  S_OnPointerEnter: button_click
   S_OnPointerExit: 
   S_OnPointerUp: 
