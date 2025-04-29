@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System;
+using Zenject;
 
 public class Ball_Client : MonoBehaviourPun
 {
@@ -13,6 +14,8 @@ public class Ball_Client : MonoBehaviourPun
     [SerializeField]
     string BounceSound;
 
+    private ISoundService _soundService;
+    
     
 
     [PunRPC]
@@ -33,6 +36,12 @@ public class Ball_Client : MonoBehaviourPun
         //Instantiate(SparkEffect, pos, rot);
 
         Instantiate(SparkEffect, transform.position,Quaternion.identity);
-        SoundManager.Play(BounceSound);
+        _soundService.PlaySound(BounceSound);
+    }
+
+    [Inject]
+    public void Initialize(ISoundService soundService)
+    {
+        _soundService = soundService;
     }
 }

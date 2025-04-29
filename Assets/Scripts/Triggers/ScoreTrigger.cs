@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Photon.Pun;
+using Zenject;
 
 public class ScoreTrigger : MonoBehaviour
 {
@@ -19,7 +20,14 @@ public class ScoreTrigger : MonoBehaviour
 
     [SerializeField]
     string ScoreSound = "ScoreSound";
-
+    
+    private ISoundService _soundService;
+    
+    [Inject]
+    public void Initialize(ISoundService soundService)
+    {
+        _soundService = soundService;
+    }
 
     private void Start()
     {
@@ -38,7 +46,7 @@ public class ScoreTrigger : MonoBehaviour
     public  void LigthOnScore()
     {
         scoreLight.GetComponent<Animator>().SetTrigger("score");
-        SoundManager.Play(ScoreSound);
+        _soundService.PlaySound(ScoreSound);
     }
     private void OnTriggerEnter(Collider other)
     {
