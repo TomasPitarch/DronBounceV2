@@ -36,14 +36,14 @@ public class LoginView : ScreenUI
     { 
         //TODO:Implements the complete validation logic
         return true;
-        if ((!string.IsNullOrEmpty(text) && !string.IsNullOrWhiteSpace(text)))
-        {
-            return true;EnableConnectButton();
-        }
-        else
-        {
-            return false;DisableConnectButton();
-        }
+        // if ((!string.IsNullOrEmpty(text) && !string.IsNullOrWhiteSpace(text)))
+        // {
+        //     return true;EnableConnectButton();
+        // }
+        // else
+        // {
+        //     return false;DisableConnectButton();
+        // }
 
     }
     
