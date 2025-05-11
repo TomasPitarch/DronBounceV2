@@ -4,9 +4,10 @@ public class LobbyPresenter
 {
     private LobbyView _lobbyView;
     private ILobbyService _lobbyService;
+    private ISceneManagerService _sceneManagerService;
     
 
-    public LobbyPresenter(LobbyView lobbyView,ILobbyService lobbyService)
+    public LobbyPresenter(LobbyView lobbyView,ILobbyService lobbyService,ISceneManagerService sceneManagerService)
     {
         _lobbyView = lobbyView;
         _lobbyView.OnStartButtonClick += StartGame;
@@ -16,6 +17,8 @@ public class LobbyPresenter
 
         _lobbyService.OnPlayerListUpdate += PlayersUpdate;
         _lobbyService.OnBecomeServer += EnableStartCapabilities;
+
+        _sceneManagerService = sceneManagerService;
     }
 
     private void ShowViewHandler()
@@ -35,7 +38,7 @@ public class LobbyPresenter
 
     public void StartGame()
     {
-        //photonView.RPC("LoadGameScene",RpcTarget.All);
+        _sceneManagerService.LoadSceneAsyncAllClients("Game");
     }
     
 }
