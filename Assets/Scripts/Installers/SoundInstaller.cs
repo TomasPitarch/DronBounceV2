@@ -15,9 +15,13 @@ public class SoundInstaller : MonoInstaller<SoundInstaller>
         GameObjectFactory gameObjectFactory = Instantiate(gameObjectFactoryPrefab);
         gameObjectFactory.name = "Game Object Factory";
 
-        GameObject audioSourceParent = new GameObject();
-        audioSourceParent.name = "Audio Sources";
+        GameObject audioSourceParent = new ()
+        {
+            name = "Audio Sources",
+        };
         Transform audioSourceTransform = audioSourceParent.transform;
+
+        DontDestroyOnLoad(audioSourceParent);
         
         
         Container.Bind<IFactory<IAudioSourceWrapper>>().
