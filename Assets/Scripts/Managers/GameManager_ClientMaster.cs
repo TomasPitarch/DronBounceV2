@@ -1,17 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
-using System.Threading.Tasks;
+using Zenject;
 
-public class GameManager_ClientMaster : MonoBehaviourPunCallbacks
+public class GameManager_ClientMaster : MonoBehaviourPunCallbacks,IObservable<GameState>
 {
+    private readonly List<IObserver<GameState>> _observers = new ();
+    
     GameManager_Client GM_Client;
 
-    [SerializeField]
-    BallSpawner myBallSpawner;
+    
+    private BallManager _ballManager;
 
     [SerializeField]
     public ScoreManager_ClientMaster myScoreManager;
@@ -24,8 +25,13 @@ public class GameManager_ClientMaster : MonoBehaviourPunCallbacks
     int MaxPlayerAllowed;
 
     public Dictionary<int,Player> PlayersOrders;
-    List<Player> ActivePlayers;
-   
+    private List<Player> ActivePlayers;
+
+    [Inject]
+    public void Initialize(BallManager ballManager)
+    {
+        _ballManager = ballManager;
+    }
     void Awake()
     {
         if (!PhotonNetwork.IsMasterClient)
@@ -36,7 +42,8 @@ public class GameManager_ClientMaster : MonoBehaviourPunCallbacks
         PlayersOrders = new Dictionary<int, Player>();
         ActivePlayers = new List<Player>();
         OnPlayerEnteredRoom(PhotonNetwork.LocalPlayer);
-        
+        Subscribe(_ballManager);
+
     }
     void Start()
     {
@@ -50,6 +57,9 @@ public class GameManager_ClientMaster : MonoBehaviourPunCallbacks
             StartGame();
         }
     }
+    
+   
+
     void PlayerLose(int order)
     {
         myScoreManager.EndTriggerFunction(order);
@@ -81,14 +91,18 @@ public class GameManager_ClientMaster : MonoBehaviourPunCallbacks
 
     async void StartGame()
     {
-
-        await _freezeCounter.StartCounter(5);
-        
-        RegisterPlayers();
-
-        //SpawnTank();
-        myBallSpawner.FirstBall();
-        myScoreManager.SetInitialScores();
+        try
+        {
+            await _freezeCounter.StartCounter(5);
+            RegisterPlayers();
+            NotifyGameStart();
+            //TODO:suscribe score manager to listen the start notify
+            myScoreManager.SetInitialScores();
+        }
+        catch (Exception e)
+        {
+            throw e; // TODO handle exception
+        }
     }
 
     private void RegisterPlayers()
@@ -103,10 +117,9 @@ public class GameManager_ClientMaster : MonoBehaviourPunCallbacks
         }
     }
 
-    void EndGame()
+    private void EndGame()
     {
-        Debug.Log("GM/clientmaster/endgame()");
-        myBallSpawner.EndGame();
+        NotifyGameEnded();
     }
 
     void SpawnTank()
@@ -114,27 +127,46 @@ public class GameManager_ClientMaster : MonoBehaviourPunCallbacks
         PhotonNetwork.Instantiate("Tank", new Vector3(-1, 0.4f, 0.3f)
         , Quaternion.identity);
     }
-    //public override void OnPlayerEnteredRoom(Player newPlayer)
-    //{
-    //    if(PhotonNetwork.IsMasterClient)
-    //    {
-    //        PlayersOrders.Add(PhotonNetwork.CurrentRoom.PlayerCount - 1, newPlayer);
+    private void NotifyGameEnded()
+    {
+        foreach (IObserver<GameState> observer in _observers)
+        {
+            observer.OnNext(GameState.Ended); 
+        }
+    }
+    private void NotifyGameStart()
+    {
+        foreach (IObserver<GameState> observer in _observers)
+        {
+            observer.OnNext(GameState.Started); 
+        }
+    }
+    
+    internal class Unsubscriber<T> : IDisposable
+    {
+        private List<T> _observers;
+        private T _observer;
 
-    //        ActivePlayers.Add(newPlayer);
+        public Unsubscriber(List<T> observers, T observer)
+        {
+            this._observers = observers;
+            this._observer = observer;
+        }
 
-    //        var order = PhotonNetwork.CurrentRoom.PlayerCount;
+        public void Dispose()
+        {
+            if (_observer != null && _observers.Contains(_observer))
+            {
+                _observers.Remove(_observer);
+            }
+        }
+    }
 
-    //        if (order == MaxPlayerAllowed)
-    //        {
-    //            StartGame();
-    //            PhotonNetwork.CurrentRoom.IsOpen = false;
 
-    //            Debug.Log("cerramos cupos");
-    //        }
-    //    }
-           
+    public IDisposable Subscribe(IObserver<GameState> observer)
+    {
+        _observers.Add(observer);
+        return new Unsubscriber<IObserver<GameState>>(_observers,observer);
 
-        
-    //}
-   
+    }
 }
