@@ -6,28 +6,18 @@ using UnityEngine;
 public class RotateComponent : MonoBehaviour
 {
     [SerializeField]
-    Vector3 RotationSpeed;
-
-    RectTransform rectTransform;
-    private void Start()
-    {
-        RectTransform rectTransform = GetComponent<RectTransform>();
-       
-    }
-    // Update is called once per frame
+    private Vector3 rotationSpeed;
+    
+    [SerializeField]
+    private RectTransform rectTransform;
+   
     void Update()
     {
-        if (rectTransform == null)
-        {
-            print("null");
-        }
-        else
-        {
-            //rectTransform.rotation = Quaternion.Euler((rectTransform.rotation.eulerAngles + RotationSpeed) * Time.deltaTime);
+        Rotate();
+    }
 
-        }
-        transform.rotation = Quaternion.Euler((transform.rotation.eulerAngles) + (RotationSpeed * Time.deltaTime));
-
-
+    private void Rotate()
+    {
+        transform.rotation = Quaternion.Euler((transform.rotation.eulerAngles) + (rotationSpeed * Time.deltaTime));
     }
 }
