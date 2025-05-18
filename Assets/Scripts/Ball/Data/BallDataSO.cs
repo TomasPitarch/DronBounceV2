@@ -7,4 +7,6 @@ public class BallDataSo : ScriptableObject
     public float spawnTime;
     public float initialForce;
     public string bounceSound;
+
+    public ParticleSystemProduct bounceEffect;
 }

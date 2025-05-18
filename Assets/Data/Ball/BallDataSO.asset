@@ -15,3 +15,6 @@ MonoBehaviour:
   maxAmountOfBalls: 10
   spawnTime: 5
   initialForce: 5
+  bounceSound: BounceSound
+  bounceEffect: {fileID: 5137632101133012434, guid: 8af7fc23449fb134587debd98a00604a,
+    type: 3}
