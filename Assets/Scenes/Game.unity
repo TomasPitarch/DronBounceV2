@@ -4051,7 +4051,7 @@ Transform:
   m_GameObject: {fileID: 1080216112}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.507, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6496,6 +6496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ballManager: {fileID: 1080216114}
+  gameObjectParticleFactory: {fileID: 2076041038}
   ballPrefab: {fileID: 2863715311058998058, guid: 07e4950f875939846bdba21aae38d7fe,
     type: 3}
   ballData: {fileID: 11400000, guid: 99add9485a6094242bd1a6454d0322f4, type: 2}
@@ -7815,6 +7816,50 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2068437459}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2076041037
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2076041039}
+  - component: {fileID: 2076041038}
+  m_Layer: 0
+  m_Name: ParticleSystemFactory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2076041038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076041037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5dd38a0a20e4856b75c4c3bbc3eefd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &2076041039
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076041037}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.8985524, y: -2.4344184, z: 1.84828}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2082531843
 GameObject:
   m_ObjectHideFlags: 0
@@ -8170,4 +8215,5 @@ SceneRoots:
   - {fileID: 1273825097}
   - {fileID: 1548372587}
   - {fileID: 1169094195}
+  - {fileID: 2076041039}
   - {fileID: 1388294226}
