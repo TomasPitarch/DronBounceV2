@@ -16,7 +16,15 @@ public class BallSpawner
     public void Spawn()
     {
         Ball ball = _objectPool.Get();
+        
+        ball.OnBallRelease+=RecycleBall;
         ball.Init(_spawnPosition);
+    }
+
+    private void RecycleBall(Ball ball)
+    {
+        ball.OnBallRelease-=RecycleBall;                
+        _objectPool.Release(ball);
     }
     
 }
