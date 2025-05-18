@@ -5,6 +5,9 @@ public class BallInstaller : MonoInstaller
 {
     [SerializeField]
     private BallManager ballManager;
+    
+    [SerializeField]
+    private BounceEffectParticleFactory gameObjectParticleFactory;
 
     [SerializeField] 
     private Ball ballPrefab;
@@ -13,6 +16,10 @@ public class BallInstaller : MonoInstaller
     private BallDataSo ballData;
     public override void InstallBindings()
     {
+        Container.Bind<IFactory<ParticleSystemProduct>>().FromInstance(gameObjectParticleFactory).AsSingle();
+        Container.Bind<ObjectPool<ParticleSystemProduct>>().AsTransient();
+        
+        
         Container.Bind<IFactory<Ball>>().To<PhotonBallFactory>().AsSingle().WithArguments(ballPrefab.gameObject.name);
         Container.Bind<BallSpawner>().AsSingle().WithArguments(ballManager.transform.position);
         
