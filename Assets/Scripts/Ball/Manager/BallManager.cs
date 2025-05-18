@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using Photon.Pun;
 using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
@@ -15,10 +14,8 @@ public class BallManager:MonoBehaviour,IObserver<GameState>
     {
         _ballSpawner = ballSpawner;
     }
-
     private void EndGameHandler()
     {
-        //_ballSpawner.EndGame();
         StopAllCoroutines();
     }
     private void StartGameHandler()
@@ -37,11 +34,8 @@ public class BallManager:MonoBehaviour,IObserver<GameState>
     }
     private void NextBall()
     {
-        // if(liveBalls<maxBalls)
-        // {
-            int randomInt = Random.Range(3, 6);
-            StartCoroutine(nameof(SpawnBall), randomInt);
-        // }
+        int randomInt = Random.Range(3, 6);
+        StartCoroutine(nameof(SpawnBall), randomInt);
     }
 
     #region Observer
