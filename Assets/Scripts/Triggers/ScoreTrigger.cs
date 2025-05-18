@@ -56,7 +56,7 @@ public class ScoreTrigger : MonoBehaviour
 
             if (ball != null)
             {
-                ball.BallRelease();
+                ball.DestroyBall();
                 OnScoreTrigger(Order);
             }
         }
