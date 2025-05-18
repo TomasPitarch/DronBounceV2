@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Gameplay effects
   m_EditorClassIdentifier: 
   AudioClips:
-  - Id: BallBounce
+  - Id: BounceSound
     AudioClip: {fileID: 8300000, guid: 3a55f2fe2146e6141a85cba49f56c63c, type: 3}
   - Id: ScoreSound
     AudioClip: {fileID: 8300000, guid: ab0bf9106cdd0734a879e4e01f5ea008, type: 3}
