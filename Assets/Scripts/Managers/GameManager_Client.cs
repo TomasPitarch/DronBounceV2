@@ -11,18 +11,15 @@ public class GameManager_Client : MonoBehaviourPun
     [SerializeField]
     HUDView myHUD;
 
-    //[SerializeField]
-    //public ScoreManager_ClientMaster myScoreManagerClientMaster;
-
-
+    
     public void PlayerLose(Player loserPlayer)
     {
         Debug.Log("HUD/Player Lose");
-        photonView.RPC("SetLoserClient",loserPlayer);
+        photonView.RPC(nameof(SetLoserClient),loserPlayer);
     }
     public void PlayerWin(Player winnerPlayer)
     {
-        photonView.RPC("SetWinnerClient", winnerPlayer);
+        photonView.RPC(nameof(SetWinnerClient), winnerPlayer);
     }
 
     [PunRPC]
@@ -37,9 +34,9 @@ public class GameManager_Client : MonoBehaviourPun
         myHUD.WinHUD();
     }
 
-    public void ToLogginScene()
+    public void ToLoginScene()
     {
         PhotonNetwork.Disconnect();
-        SceneManager.LoadScene("Loggin");
+        SceneManager.LoadScene("Login");
     }
 }

@@ -33,7 +33,7 @@ public class PhotonLoginService : ILoginService,IMatchmakingCallbacks
 
     public void OnCreatedRoom()
     {
-        Debug.Log("Room Created");
+        
     }
 
     public void OnCreateRoomFailed(short returnCode, string message)

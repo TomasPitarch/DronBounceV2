@@ -24,7 +24,7 @@ public class PlayerSpawner : MonoBehaviour
     private void Awake()
     {
         myCamera = Camera.main;
-        _playerController = GameObject.FindObjectOfType<PlayerController>();
+        _playerController = FindFirstObjectByType<PlayerController>();
     }
     void Start()
     {

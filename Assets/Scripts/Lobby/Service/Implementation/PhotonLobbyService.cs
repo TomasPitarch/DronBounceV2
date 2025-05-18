@@ -4,13 +4,15 @@ using System.Linq;
 using Photon.Pun;
 using Photon.Realtime;
 
+
 public class PhotonLobbyService : MonoBehaviourPunCallbacks,ILobbyService
 { 
-    private List<string> _playersList = new();
+    private readonly List<string> _playersList = new();
 
-    public PhotonLobbyService()
+    public void  Start()
     {
         PhotonNetwork.AddCallbackTarget(this);
+        DontDestroyOnLoad(this);
     }
     #region ILobbyService
     
@@ -46,13 +48,12 @@ public class PhotonLobbyService : MonoBehaviourPunCallbacks,ILobbyService
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         _playersList.Add(newPlayer.NickName);
-        //Update to all players the new player
-        photonView.RPC("RpcUpdateTeam", RpcTarget.All, ListNicknamesToString(_playersList));
+        photonView.RPC(nameof(RpcUpdateTeam), RpcTarget.All, ListNicknamesToString(_playersList));
     }
     public override void OnPlayerLeftRoom(Player playerLeft)
     {
         _playersList.Remove(playerLeft.NickName);
-        photonView.RPC("RpcUpdateTeam", RpcTarget.All,ListNicknamesToString(_playersList));
+        photonView.RPC(nameof(RpcUpdateTeam), RpcTarget.All,ListNicknamesToString(_playersList));
     }
 
     #endregion

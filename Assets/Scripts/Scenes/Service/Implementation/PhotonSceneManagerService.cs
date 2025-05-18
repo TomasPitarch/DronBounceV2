@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Zenject;
+
 
 public class PhotonSceneManagerService :MonoBehaviourPun,ISceneManagerService
 {
@@ -13,10 +13,10 @@ public class PhotonSceneManagerService :MonoBehaviourPun,ISceneManagerService
 
     private readonly List<int> _idReadyList=new ();
 
-    [Inject]
-    public void Initialize()
-    {
-        
+   
+    public void Start()
+    { 
+        DontDestroyOnLoad(this);
     }
 
     #region ISceneManagerService
@@ -38,9 +38,8 @@ public class PhotonSceneManagerService :MonoBehaviourPun,ISceneManagerService
     {
         AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
         //asyncOperation.allowSceneActivation = false;
-        SceneManager.LoadSceneAsync(sceneName).ToUniTask(_progress);
+        // await SceneManager.LoadSceneAsync(sceneName).ToUniTask(_progress);
         _loadSceneCompletionSource= asyncOperation.ToUniTask(_progress);
-
         await _loadSceneCompletionSource.ContinueWith(ClientLoadSceneComplete);
     }
     [PunRPC]
