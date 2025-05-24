@@ -121,12 +121,7 @@ public class GameManager_ClientMaster : MonoBehaviourPunCallbacks,IObservable<Ga
     {
         NotifyGameEnded();
     }
-
-    void SpawnTank()
-    {
-        PhotonNetwork.Instantiate("Tank", new Vector3(-1, 0.4f, 0.3f)
-        , Quaternion.identity);
-    }
+   
     private void NotifyGameEnded()
     {
         foreach (IObserver<GameState> observer in _observers)
