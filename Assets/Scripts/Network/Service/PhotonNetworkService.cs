@@ -4,13 +4,17 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
-public class PhotonNetworkService:INetworkService,IConnectionCallbacks
+public class PhotonNetworkService : INetworkService, IConnectionCallbacks
 {
-    private bool _isConnected=false;
+    private bool _isConnected = false;
     private UniTaskCompletionSource _serverConnectionTcs;
-    
+
+
+    public ReactiveProperty<int> Ping { get;}
+
     public PhotonNetworkService()
     {
+        Ping = new ReactiveProperty<int>(999);
         PhotonNetwork.AddCallbackTarget(this);
     }
 
@@ -18,6 +22,17 @@ public class PhotonNetworkService:INetworkService,IConnectionCallbacks
     {
         _isConnected = true;
         _serverConnectionTcs?.TrySetResult();
+        PingUpdate().Forget();
+    }
+
+    private async UniTask PingUpdate()
+    {
+        while (_isConnected)
+        {
+            Ping.Value = PhotonNetwork.GetPing();
+            Debug.Log(Ping.Value);
+            await UniTask.WaitForSeconds(1);
+        }
     }
 
     public void OnConnectedToMaster()
@@ -28,6 +43,7 @@ public class PhotonNetworkService:INetworkService,IConnectionCallbacks
     public void OnDisconnected(DisconnectCause cause)
     {
         _isConnected = false;
+        Ping.Value = 999;
     }
 
     public void OnRegionListReceived(RegionHandler regionHandler)
@@ -49,11 +65,13 @@ public class PhotonNetworkService:INetworkService,IConnectionCallbacks
     {
         return _isConnected;
     }
+    
     public UniTask Connect()
     {
         _serverConnectionTcs = new UniTaskCompletionSource();
         PhotonNetwork.ConnectUsingSettings();
         return _serverConnectionTcs.Task;
     }
+
     
 }

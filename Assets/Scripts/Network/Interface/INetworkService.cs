@@ -5,4 +5,5 @@ public interface INetworkService
 {
     public bool IsConnected();
     public UniTask Connect();
+    public ReactiveProperty<int> Ping { get; } 
 }
