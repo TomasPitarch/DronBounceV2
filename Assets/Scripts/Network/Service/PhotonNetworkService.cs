@@ -30,7 +30,6 @@ public class PhotonNetworkService : INetworkService, IConnectionCallbacks
         while (_isConnected)
         {
             Ping.Value = PhotonNetwork.GetPing();
-            Debug.Log(Ping.Value);
             await UniTask.WaitForSeconds(1);
         }
     }
