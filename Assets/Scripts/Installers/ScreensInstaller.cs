@@ -11,6 +11,9 @@ public class ScreensInstaller : MonoInstaller
     private InitialView initialView;
     
     [SerializeField]
+    private RoomView roomView;
+    
+    [SerializeField]
     private LobbyView lobbyView;
     
     public override void InstallBindings()
@@ -18,7 +21,15 @@ public class ScreensInstaller : MonoInstaller
         BindInitialConnect();
         BindLogin();
         BindLobby();
+        BindRoom();
     }
+
+    private void BindRoom()
+    {
+        Container.Bind<RoomView>().FromInstance(roomView).AsSingle();
+        Container.Bind<RoomPresenter>().AsSingle().NonLazy();
+    }
+
     private void BindLogin()
     {
         Container.Bind<LoginView>().FromInstance(loginView).AsSingle();
