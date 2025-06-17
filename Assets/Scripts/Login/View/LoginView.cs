@@ -11,10 +11,6 @@ public class LoginView : ScreenUI
     [SerializeField] [Tooltip("Text input field for entering a nickname")]
     private TMP_InputField  textNickName;
     
-    [SerializeField] [Tooltip("Text input field for entering a room name")]
-    private TMP_InputField roomName;
-
-    
     public event Action OnConnectButtonClicked;
     private void Start()
     {
