@@ -4,9 +4,11 @@ using Zenject;
 public class LobbyInstaller : MonoInstaller<LobbyInstaller>
 {
     [SerializeField]
-    private PhotonLobbyService lobbyService;
+    private PhotonRoomService roomService;
+    
     public override void InstallBindings()
     {
-        Container.Bind<ILobbyService>().FromInstance(lobbyService).AsSingle();
+        Container.Bind<IRoomService>().FromInstance(roomService).AsSingle();
+        Container.Bind<ILobbyService>().To<PhotonLobbyService>().AsSingle();
     }
 }

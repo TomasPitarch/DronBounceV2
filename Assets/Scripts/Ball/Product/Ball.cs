@@ -4,7 +4,7 @@ using Photon.Pun;
 using UnityEngine.Pool;
 using Zenject;
 
-public class Ball : MonoBehaviourPun
+public class Ball : MonoBehaviourPun,IPoolable
 {
     public event Action<Ball> OnBallRelease;
     
@@ -133,5 +133,9 @@ public class Ball : MonoBehaviourPun
     }
     #endregion
 
-    
+
+    public void OnRelease()
+    {
+        gameObject.SetActive(false);
+    }
 }

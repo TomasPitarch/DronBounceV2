@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 
-public class ObjectPool<T> where T : class
+public class ObjectPool<T> where T : IPoolable
 {
     private readonly IFactory<T> _factory;
     private readonly List<T> _availableObjects = new List<T>();
@@ -53,7 +53,7 @@ public class ObjectPool<T> where T : class
         }
 
         
-        return null; 
+        return default; 
     }
     public void Release(T obj)
     {
@@ -61,7 +61,8 @@ public class ObjectPool<T> where T : class
         {
             return; 
         }
-
+        
+        obj.OnRelease();
         _inUseObjects.Remove(obj);
         _availableObjects.Add(obj);
     }

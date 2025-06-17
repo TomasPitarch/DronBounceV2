@@ -9,12 +9,12 @@ using System;
         public event Action OnShow;
         public event Action OnHide;
         public string ScreenId => screenId;
-        public void Show()
+        public virtual void Show()
         {
             gameObject.SetActive(true);
             OnShow?.Invoke();
         }
-        public void Hide()
+        public virtual void Hide()
         {
             gameObject.SetActive(false);
             OnHide?.Invoke();

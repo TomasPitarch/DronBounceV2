@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public interface IAudioSourceWrapper
+public interface IAudioSourceWrapper:IPoolable
 {
     AudioSource AudioSource { get; }
     public void Play();

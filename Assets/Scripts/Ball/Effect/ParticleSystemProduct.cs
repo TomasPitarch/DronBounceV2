@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class ParticleSystemProduct : MonoBehaviour
+public class ParticleSystemProduct : MonoBehaviour,IPoolable
 {
     [SerializeField] private ParticleSystem _particleSystem;
     
@@ -14,5 +14,10 @@ public class ParticleSystemProduct : MonoBehaviour
     private void OnParticleSystemStopped()
     {
         OnParticleSystemStop?.Invoke();
+    }
+
+    public void OnRelease()
+    {
+        _particleSystem.Stop();
     }
 }

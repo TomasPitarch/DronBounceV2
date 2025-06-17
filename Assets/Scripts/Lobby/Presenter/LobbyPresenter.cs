@@ -1,44 +1,82 @@
+using System;
 using System.Collections.Generic;
+
 
 public class LobbyPresenter
 {
-    private LobbyView _lobbyView;
-    private ILobbyService _lobbyService;
-    private ISceneManagerService _sceneManagerService;
+    private readonly LobbyView _view;
+    private readonly ILobbyService _lobbyService;
+    private readonly Navigator _navigator;
+
+
+    private RoomItem _currentRoomSelected;
     
 
-    public LobbyPresenter(LobbyView lobbyView,ILobbyService lobbyService,ISceneManagerService sceneManagerService)
+    public LobbyPresenter(LobbyView view, ILobbyService lobbyService,Navigator navigator)
     {
-        _lobbyView = lobbyView;
-        _lobbyView.OnStartButtonClick += StartGame;
-        _lobbyView.OnShow += ShowViewHandler;
+        _view = view;
+        _lobbyService = lobbyService;
+        _navigator = navigator;
         
-        _lobbyService=lobbyService;
+        _view.OnRefreshButtonPress += UpdateListOfRooms;
+        _view.OnConnectButtonPress += ConnectToRoom;
+        _view.OnRoomButtonPress += RoomSelectHandler;
+        _view.OnCreateRoomButtonPress += AcceptCreateRoomButtonHandler;
+        _view.OnCreateRoomOpenWindowButtonPress += CreateRoomButtonHandler;
 
-        _lobbyService.OnPlayerListUpdate += PlayersUpdate;
-        _lobbyService.OnBecomeServer += EnableStartCapabilities;
-
-        _sceneManagerService = sceneManagerService;
+        _lobbyService.OnRoomListUpdated+= ListOfRoomsUpdateHandler;
     }
 
-    private void ShowViewHandler()
+    private void ListOfRoomsUpdateHandler(List<RoomItem> listOfRooms)
+    {   //TODO:Should be called when lobby is opened. If a lot of rooms are created, it can be a problem
+        _currentRoomSelected = null;
+        _view.SetRoomName("");
+        _view.UpdateListOfRooms(listOfRooms);
+    }
+
+    private async void AcceptCreateRoomButtonHandler(string roomName)
     {
-        _lobbyView.SetRoomName(_lobbyService.RoomName());
+        try
+        {
+            //TODO:loading feedback and remove hardcode type of room
+            await _lobbyService.CreateRoom(roomName, _view.GetTypeOfRoomSelected());
+            _navigator.OpenScreen("Login");
+        }
+        catch (Exception e)
+        {
+            throw; // TODO handle exception
+        }
+    }
+    private void CreateRoomButtonHandler()
+    {
+        _view.OpenCreateRoomWindow();
     }
 
-    private void EnableStartCapabilities()
+    private void RoomSelectHandler(RoomItem roomItem)
     {
-        _lobbyView.EnableStartButton();
+        _currentRoomSelected = roomItem;
+        _view.SetRoomName(_currentRoomSelected.RoomName);
+    }
+  
+    private async void ConnectToRoom()
+    {
+        try
+        {
+            if (_currentRoomSelected is null) return;
+            await _lobbyService.Connect(_currentRoomSelected.RoomName);
+            _navigator.OpenScreen("Login");
+        }
+        catch (Exception e)
+        {
+            throw; // TODO handle exception
+        }
     }
 
-    private void PlayersUpdate(List<string> players)
+    private void UpdateListOfRooms()
     {
-        _lobbyView.SetPlayersNames(players);
+        List<RoomItem> rooms = _lobbyService.GetRooms();
+        _currentRoomSelected = null;
+        _view.SetRoomName("");
+        _view.UpdateListOfRooms(rooms);
     }
-
-    public void StartGame()
-    {
-        _sceneManagerService.LoadSceneAsyncAllClients("Game");
-    }
-    
 }

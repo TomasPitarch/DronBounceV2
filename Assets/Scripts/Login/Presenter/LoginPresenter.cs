@@ -4,46 +4,38 @@ using Zenject;
 
 public class LoginPresenter
 {
-    private LoginView _loginView;
-    
-    private ILoginService _loginService;
-    private Navigator _navigator;
+    private readonly LoginView _loginView;
+    private readonly Navigator _navigator;
+    private readonly IRoomService _roomService;
 
-    public LoginPresenter(LoginView loginView,ILoginService loginService, Navigator navigator)
+    public LoginPresenter(LoginView loginView, Navigator navigator,IRoomService roomService)
     {
         _loginView = loginView;
-        _loginService = loginService;
         _navigator = navigator;
+        _roomService = roomService;
 
 
-        _loginView.OnConnectButtonClicked += ConnectToRoom;
+        _loginView.OnConnectButtonClicked += ConnectHandler;
         _loginView.DisableConnectButton();
     }
   
-    private void ConnectToRoom()
+    private void ConnectHandler()
     {
         _loginView.DisableConnectButton();
-        PhotonNetwork.NickName = _loginView.GetNickName();
-        _loginService.ConnectToDefaultRoom().ContinueWith(OnLoginResponse);
+        OnAuthenticationNameResponse(_roomService.AuthenticateName(_loginView.GetNickName()));
     }
-    private void OnLoginResponse(LoginResponse response)
+
+    private void OnAuthenticationNameResponse(AuthenticateResponse response)
     {
-        _loginView.DisableConnectButton();  
-        switch (response.Status)
+        switch (response)
         {
-            case LoginStatus.Success:
-                LoginSuccess();
-                break;
-            case LoginStatus.InvalidNickName:
-                break;
-            case LoginStatus.Error:
+            case AuthenticateResponse.Accepted:
+            _navigator.OpenScreen("Room");
+            break;
+            case AuthenticateResponse.NameAlreadyExists:
+                _loginView.EnableConnectButton();
                 break;
         }
     }
-    private void LoginSuccess()
-    {
-        //TODO:Move out of here, implement a non generic nickname and
-        // use the navigator instead of a change of scene
-        _navigator.OpenScreen("Lobby");
-    }
+   
 }
