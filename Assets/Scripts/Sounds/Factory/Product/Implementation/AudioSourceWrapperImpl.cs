@@ -52,5 +52,9 @@ public class AudioSourceWrapperImpl : IAudioSourceWrapper, IInitializable, IDisp
     }
 
     #endregion
-   
+
+    public void OnRelease()
+    {
+        AudioSource.Stop();
+    }
 }
