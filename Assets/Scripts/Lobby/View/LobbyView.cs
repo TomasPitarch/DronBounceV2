@@ -2,62 +2,149 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
+ using UnityEngine.UI;
 
-
-public class LobbyView :ScreenUI
+public class LobbyView : ScreenUI,IFactory<RoomItemButton>
 {
-    public event Action OnStartButtonClick;
-
-    private string emptySlotString = "---Slot {0}---";
+    public event Action OnConnectButtonPress; 
     
+    public event Action OnRefreshButtonPress; 
+    
+    public event Action<RoomItem> OnRoomButtonPress;
+
+    public event Action OnCreateRoomOpenWindowButtonPress;
+    
+    public event Action<string> OnCreateRoomButtonPress;
     
     [SerializeField]
-    private List<TextMeshProUGUI> listOfNickNames;
+    private Button refreshButton;
+    
+    [SerializeField]
+    private Button connectButton;
+    
+    [SerializeField]
+    private Button createRoomButton;
 
     [SerializeField]
-    private Button startButton;
+    private TextMeshProUGUI selectedRoomName;
 
+    [SerializeField] 
+    private RoomItemButton roomItemButtonPrefab;
+    
     [SerializeField]
-    private TextMeshProUGUI roomName;
+    private Transform content;
     
+    [SerializeField] [Tooltip("Text input field for entering a room name")]
+    private TMP_InputField roomName;
 
-    public void Start()
-    {
-        startButton.onClick.AddListener(StartButtonHandler);
-    }
+    [SerializeField] 
+    private GameObject createRoomWindow;
     
-    private void StartButtonHandler()
-    {
-        OnStartButtonClick?.Invoke();
-    }
+    [SerializeField]
+    private Button acceptRoomButton;
     
-    public void SetPlayersNames(List<string> newListOfNickNames)
-    {
-        for(int i=0;i<listOfNickNames.Count;i++)
-        {
-            int difference = i - newListOfNickNames.Count;
-            if (difference < 0)
-            {
-                listOfNickNames[i].text = newListOfNickNames[i];
-            }
-            else
-            {
-                listOfNickNames[i].text = string.Format(emptySlotString, i + 1);
-            }
-           
-            
-        }
-    }
+    [SerializeField]
+    private TMP_Dropdown dropdown;
     
+    
+    private ObjectPool<RoomItemButton> _roomItemButtonPool;
+    private List<RoomItemButton> _roomItemButtonsList;
+
+    private const string RoomNamePrefix = "Room selected:{0}";
+
+    private void Awake()
+    {
+        refreshButton.onClick.AddListener(RefreshButtonPress);
+        connectButton.onClick.AddListener(ConnectButtonPress);
+        acceptRoomButton.onClick.AddListener(CreateRoomButtonPress);
+        createRoomButton.onClick.AddListener(CreateRoomOpenWindowButtonPress);
+        
+
+        _roomItemButtonPool = new ObjectPool<RoomItemButton>(this);
+        _roomItemButtonPool.Configure(0,20);
+        
+        _roomItemButtonsList = new List<RoomItemButton>();
+    }
+
+    private void CreateRoomOpenWindowButtonPress()
+    {
+        OnCreateRoomOpenWindowButtonPress?.Invoke();
+    }
+
+    private void CreateRoomButtonPress()
+    {
+        OnCreateRoomButtonPress?.Invoke(roomName.text);
+    }
+
+    private void ConnectButtonPress()
+    {
+        OnConnectButtonPress?.Invoke();
+    }
+
+    private void RefreshButtonPress()
+    {
+        OnRefreshButtonPress?.Invoke();
+    }
+
     public void SetRoomName(string newRoomName)
     {
-        roomName.text=newRoomName;
+        selectedRoomName.text=string.Format(RoomNamePrefix,newRoomName);
     }
-    
-    public void EnableStartButton()
+
+    public void UpdateListOfRooms(List<RoomItem> rooms)
     {
-        startButton.gameObject.SetActive(true);
+        ClearRoomsButtons();
+        
+        if (rooms is null) return;
+       
+        foreach (RoomItem item in rooms)
+        {   
+            RoomItemButton newItemButton=_roomItemButtonPool.Get();
+            _roomItemButtonsList.Add(newItemButton);
+            newItemButton.SetRoom(item);
+            newItemButton.Button.onClick.AddListener(()=>{OnRoomButtonPress?.Invoke(item);});
+        }
+        
     }
-    
+
+    private void ClearRoomsButtons()
+    {
+        foreach (RoomItemButton auxiliarItem in _roomItemButtonsList)
+        {
+            _roomItemButtonPool.Release(auxiliarItem);
+        }
+        _roomItemButtonsList.Clear();
+    }
+
+    private void ShowCreateRoomWindow()
+    {
+        createRoomWindow.SetActive(true);
+    }
+
+    public override void Show()
+    {
+        base.Show();
+        createRoomWindow.SetActive(false);
+    }
+
+    public void OpenCreateRoomWindow()
+    {
+        ShowCreateRoomWindow();
+    }
+
+    public TypeOfRoom GetTypeOfRoomSelected()
+    {
+        int valueSelected = dropdown.value;
+        return (TypeOfRoom)valueSelected;
+    }
+
+    #region IFactory<RoomItemButton>
+
+    public RoomItemButton Create()
+    {
+        return Instantiate(roomItemButtonPrefab, Vector3.zero, Quaternion.identity, content);
+    }
+
+    #endregion
+   
 }
