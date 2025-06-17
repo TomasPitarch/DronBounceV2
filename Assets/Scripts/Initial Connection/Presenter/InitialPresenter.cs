@@ -51,6 +51,6 @@ public class InitialPresenter
     private void ConnectSuccessNextScreen()
     {
         //TODO:change implementation without hardcoding string
-        _navigator.OpenScreen("Login");
+        _navigator.OpenScreen("Lobby");
     }
 }

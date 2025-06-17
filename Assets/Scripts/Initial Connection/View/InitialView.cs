@@ -13,7 +13,7 @@ public class InitialView:ScreenUI
 
     [SerializeField] private float loadingRotationSpeed; 
     
-    Coroutine _rotateLoadingImageCoroutine;
+    private Coroutine _rotateLoadingImageCoroutine;
     
     public event Action OnConnectButtonClicked;
 
