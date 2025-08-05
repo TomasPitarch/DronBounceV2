@@ -1,96 +1,136 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Pun;
-using System;
 using TMPro;
 
-public class HUDView : MonoBehaviourPun
+public class HUDView : MonoBehaviour
 {
+    public event Action OnShow;
+    public event Action OnReLogButtonClicked;
+    
     [SerializeField]
-    Text roomText;
-
-    [SerializeField]
-    TextMeshProUGUI resultText;
-
-    [SerializeField]
-    Button ReLogButton;
+    private TextMeshProUGUI roomText;
 
     [SerializeField]
-    GameManager_ClientMaster myGM;
+    private TextMeshProUGUI resultText;
 
     [SerializeField]
-    List<Text> ScoreVList;
+    private Button reLogButton;
 
     [SerializeField]
-    List<Text> ScoreVNames;
+    private List<ScoreItemUI> scoreItemsUIList;
 
 
-    private void Awake()
+    private Dictionary<PlayerOrder, ScoreItemUI> _playerOrderBind = new();
+    
+    private void Start()
     {
-        myGM.myScoreManager.OnScoreGoal += RefreshScores;
-    }
-    void Start()
-    {
-        roomText.text ="Sala:"+ PhotonNetwork.CurrentRoom.Name;
-        
         resultText.gameObject.SetActive(false);
+        reLogButton.onClick.AddListener(ReLogButtonClicked);
     }
-
-    void RefreshScores(int PlayerOrder, int newScore)
+    
+    public void InitializeHud(TypeOfRoom typeOfRoom,string roomName,int defaultScore )
     {
-           if(myGM.PlayersOrders.ContainsKey(PlayerOrder))
-           {
-                photonView.RPC("SendRefreshScores", RpcTarget.All, PlayerOrder, myGM.PlayersOrders[PlayerOrder].NickName, newScore);
-           }
-           else
-           {
-                photonView.RPC("SendRefreshScores", RpcTarget.All, PlayerOrder,PlayerOrder.ToString(), newScore);
-           }
+        SetRoomName(roomName);
+        switch (typeOfRoom)
+        {
+            case TypeOfRoom.PvP:
+                SetPvsPHud();
+                break;
+            case TypeOfRoom.AllVsAll:
+                SetAllVsAllHud();
+                break;
+            default:
+                Debug.LogError("Unknown room type");
+                break;
+        }
+
+        foreach (var pair in _playerOrderBind)
+        {
+            pair.Value.SetPlayerScore(defaultScore);
+        }
     }
 
-    [PunRPC]
-    void SendRefreshScores(int PlayerOrder,string playername, int newScore)
+    private void ReLogButtonClicked()
     {
-       if (playername=="")
-       {
-            ScoreVList[PlayerOrder].text = ("Player" + PlayerOrder + ":" + newScore);
-
-       }
-       else
-       {
-            ScoreVList[PlayerOrder].text = newScore.ToString();
-            ScoreVNames[PlayerOrder].text = playername;
-       }
-
+        OnReLogButtonClicked?.Invoke();
     }
-    public void WinHUD()
+    public void SetRoomName(string roomName)
+    {
+        roomText.text = "Room: " + roomName;
+    }
+    public void SetPlayerScore(PlayerOrder playerOrder, int score)
+    {
+        if (_playerOrderBind.TryGetValue(playerOrder, out ScoreItemUI scoreItemUI))
+        {
+            scoreItemUI.SetPlayerScore(score);
+        }
+        else
+        {
+            Debug.LogError($"PlayerOrder {playerOrder} not found in _playerOrderBind");
+        }
+    }
+    public void SetPlayerName(PlayerOrder playerOrder, string playerName)
+    {
+        if (_playerOrderBind.TryGetValue(playerOrder, out ScoreItemUI scoreItemUI))
+        {
+            scoreItemUI.SetPlayerName(playerName);
+        }
+        else
+        {
+            Debug.LogError($"PlayerOrder {playerOrder} not found in _playerOrderBind");
+        }
+    }
+   
+    public void ShowWinHud()
     {
         resultText.gameObject.SetActive(true);
-        resultText.text = "Ganaste";
+        resultText.text = "You Win";
         resultText.color = Color.green;
 
-        ReLogButton.gameObject.SetActive(true);
+        reLogButton.gameObject.SetActive(true);
 
 
     }
-    public void LoseHUD()
+    public void ShowLoseHud()
     {
         resultText.gameObject.SetActive(true);
-        resultText.text = "Perdiste";
+        resultText.text = "You Lose";
         resultText.color = Color.red;
 
-        ReLogButton.gameObject.SetActive(true);
+        reLogButton.gameObject.SetActive(true);
     }
 
-    //void SetScoresAtStart()
-    //{
-    //    Debug.Log("seteo de scores vuelta:");
-    //    for (int i=0;i<ScoreVList.Count;i++)
-    //    {
-    //        Debug.Log("seteo de scores vuelta:" + i);
-    //        RefreshScores(i, myGM.myScoreManager.DefaultGoal);
-    //    }
-    //}
+    public void SetPvsPHud()
+    {
+        _playerOrderBind.Clear();
+        
+        _playerOrderBind.Add(PlayerOrder.Player1,scoreItemsUIList[0]);
+        _playerOrderBind.Add(PlayerOrder.Player2,scoreItemsUIList[1]);
+
+        scoreItemsUIList[0].TurnOn();
+        scoreItemsUIList[1].TurnOn();
+        scoreItemsUIList[2].TurnOff();
+        scoreItemsUIList[3].TurnOff();
+        
+    }
+    public void SetAllVsAllHud()
+    {
+        _playerOrderBind.Clear();
+        
+        int i = 0;
+        foreach (ScoreItemUI itemUI in scoreItemsUIList)
+        {
+            _playerOrderBind.Add((PlayerOrder)i,itemUI);
+            scoreItemsUIList[i].TurnOn();
+            i++;
+        }
+    }
+    public void OnEnable()
+    {
+        OnShow?.Invoke();
+    }
+   
+   
 }
