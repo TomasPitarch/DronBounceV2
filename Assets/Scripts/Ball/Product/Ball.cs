@@ -10,6 +10,9 @@ public class Ball : MonoBehaviourPun,IPoolable
     
     [SerializeField]
     private Rigidbody _rigidbody;
+    
+    [SerializeField]
+    private BallInstantiateDataBusSo ballBus;
 
     private BallDataSo _ballData;
     private ISoundService _soundService;
@@ -34,17 +37,15 @@ public class Ball : MonoBehaviourPun,IPoolable
             }
             
         }
+        ballBus.SendInstantiateBall(this);
     }
-    private void Update()
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            _rigidbody.linearVelocity = _rigidbody.linearVelocity.normalized * _ballData.initialForce;
-        }
-    }
+   
     public void Init(Vector3 startPosition)
     {
-        photonView.RPC(nameof(InitRPC),RpcTarget.All,startPosition);
+        gameObject.transform.position = startPosition;
+        _rigidbody.constraints = RigidbodyConstraints.None;
+        _rigidbody.linearVelocity = (GetRandomDirection() * _ballData.initialForce);
+        gameObject.SetActive(true); 
     }
     private Vector3 GetRandomDirection()
     {
@@ -59,12 +60,7 @@ public class Ball : MonoBehaviourPun,IPoolable
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            return;
-        }
-
-        photonView.RPC(nameof(CollisionEffectRPC),RpcTarget.All);
+        CollisionEffect();
     }
     private void OnCollisionExit(Collision collision)
     {
@@ -74,15 +70,9 @@ public class Ball : MonoBehaviourPun,IPoolable
         }
 
         if (!collision.gameObject.CompareTag("Floor")) return;
+        _rigidbody.linearVelocity = _rigidbody.linearVelocity.normalized * _ballData.initialForce;
         _rigidbody.constraints = RigidbodyConstraints.FreezePositionY;
         transform.position = new Vector3(transform.position.x, 0.25f, transform.position.z);
-    }
-    private void InitializeBall(Vector3 startPosition)
-    {
-        gameObject.transform.position = startPosition;
-        _rigidbody.constraints = RigidbodyConstraints.None;
-        _rigidbody.linearVelocity = (GetRandomDirection() * _ballData.initialForce);
-        gameObject.SetActive(true);
     }
     private void BallRelease()
     {
@@ -92,8 +82,8 @@ public class Ball : MonoBehaviourPun,IPoolable
     private void CollisionEffect()
     {
         ParticleSystemProduct spark;
-        GetAndSetSpark().PlayParticleSystem();
         _soundService.PlaySound(_ballData.bounceSound);
+        GetAndSetSpark().PlayParticleSystem();
         return;
 
         void ReleaseParticle()
@@ -114,11 +104,6 @@ public class Ball : MonoBehaviourPun,IPoolable
     }
 
     #region RPCs
-    [PunRPC]
-    private void CollisionEffectRPC()
-    {
-        CollisionEffect();
-    }
    
     [PunRPC]
     private void BallReleaseRPC()
@@ -126,11 +111,6 @@ public class Ball : MonoBehaviourPun,IPoolable
         BallRelease();
     }
     
-    [PunRPC]
-    private void InitRPC(Vector3 startPosition)
-    {
-     InitializeBall(startPosition);  
-    }
     #endregion
 
 
@@ -139,3 +119,4 @@ public class Ball : MonoBehaviourPun,IPoolable
         gameObject.SetActive(false);
     }
 }
+

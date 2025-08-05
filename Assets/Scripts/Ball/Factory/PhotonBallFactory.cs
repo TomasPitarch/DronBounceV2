@@ -2,22 +2,36 @@ using Photon.Pun;
 using UnityEngine;
 using Zenject;
 
-public class PhotonBallFactory : IFactory<Ball>
+public class PhotonBallFactory : MonoBehaviour,IFactory<Ball>
 {
-    private readonly DiContainer _container;
+    private DiContainer _container;
     
-    private readonly string _ballPrefabName;
-
-    public PhotonBallFactory(string ballPrefabName,DiContainer container)
+    [SerializeField] 
+    private Ball ballPrefab;
+    
+    [SerializeField]
+    private BallInstantiateDataBusSo ballInstantiateDataBusSo;
+    
+    private void Awake()
     {
-        _ballPrefabName=ballPrefabName;
+        ballInstantiateDataBusSo.OnInstantiateBall += InjectDependencies;
+    }
+    [Inject]
+    public void InjectDependencies(DiContainer container)
+    {
         _container = container;
     }
+   
     public Ball Create()
     {
-        Ball ball = PhotonNetwork.Instantiate(_ballPrefabName, Vector3.zero, Quaternion.identity).GetComponent<Ball>();
-        _container.Inject(ball);
-
+        Ball ball = PhotonNetwork.Instantiate(ballPrefab.name, Vector3.zero, Quaternion.identity).GetComponent<Ball>();
+       
         return ball;
     }
+   
+    private void InjectDependencies(Ball ball)
+    {
+        _container.Inject(ball.GetComponent<Ball>());
+    }
+    
 }
