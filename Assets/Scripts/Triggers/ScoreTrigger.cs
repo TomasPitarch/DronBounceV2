@@ -8,8 +8,8 @@ using Zenject;
 public class ScoreTrigger : MonoBehaviour
 {
     //Events//
-    public event Action<int> OnScoreTrigger = delegate { };
-    public int Order;
+    public event Action<PlayerOrder> OnScoreTrigger;
+    public PlayerOrder PlayerOrder;
 
     Collider myCollider;
     Rigidbody myRigidbody;
@@ -52,12 +52,12 @@ public class ScoreTrigger : MonoBehaviour
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            var ball = other.GetComponent<Ball>();
+            Ball ball = other.GetComponent<Ball>();
 
             if (ball != null)
             {
                 ball.DestroyBall();
-                OnScoreTrigger(Order);
+                OnScoreTrigger?.Invoke(PlayerOrder);
             }
         }
     }
