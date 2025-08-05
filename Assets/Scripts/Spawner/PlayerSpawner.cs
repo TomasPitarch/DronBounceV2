@@ -1,51 +1,68 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime;
+
 
 public class PlayerSpawner : MonoBehaviour
 {
     [SerializeField]
-    List<GameObject> SpawnPoints;
+    private List<GameObject> spawnPoints;
 
     [SerializeField]
-    List<GameObject> CameraSpawnPoints;
+    private List<GameObject> cameraSpawnPoints;
 
    
-    Camera myCamera;
+    private Camera _myCamera;
 
     [SerializeField]
-    string PlayerPrefabName;
+    private string playerPrefabName;
 
     [SerializeField]
-    PlayerController _playerController;
+    private PlayerController playerController;
+    
+    private TypeOfRoom _typeOfRoom;
 
-    private void Awake()
+    private void Start()
     {
-        myCamera = Camera.main;
-        _playerController = FindFirstObjectByType<PlayerController>();
+        _myCamera = Camera.main;
+        playerController = FindFirstObjectByType<PlayerController>();
     }
-    void Start()
+
+    public void SpawnPlayer(PlayerOrder playerOrder)
     {
-        var order = PhotonNetwork.LocalPlayer.ActorNumber-1;
+        int order = PlayerOrderToIndex(playerOrder);
 
-        var rotation = new Quaternion();
+        Quaternion rotation = new Quaternion();
 
-        rotation.eulerAngles = SpawnPoints[order].transform.eulerAngles;
+        rotation.eulerAngles = spawnPoints[order].transform.eulerAngles;
         
-        var character = PhotonNetwork.Instantiate(PlayerPrefabName,
-                                  SpawnPoints[order].transform.position,
-                                  rotation);
+        GameObject character = PhotonNetwork.Instantiate(playerPrefabName,
+            spawnPoints[order].transform.position,
+            rotation);
 
 
 
-        myCamera.transform.position = CameraSpawnPoints[order].transform.position;
-        rotation.eulerAngles = CameraSpawnPoints[order].transform.eulerAngles;
-        myCamera.transform.eulerAngles = rotation.eulerAngles;
+        _myCamera.transform.position = cameraSpawnPoints[order].transform.position;
+        rotation.eulerAngles = cameraSpawnPoints[order].transform.eulerAngles;
+        _myCamera.transform.eulerAngles = rotation.eulerAngles;
 
 
-        _playerController.SetCharacter(character.GetComponent<Character>());
+        playerController.SetCharacter(character.GetComponent<Character>());
+    }
+
+    public void SetTypeOfRoom(TypeOfRoom typeOfRoom)
+    {
+        _typeOfRoom = typeOfRoom;
+    }
+  
+    private int PlayerOrderToIndex(PlayerOrder playerOrder)
+    {
+        if (_typeOfRoom == TypeOfRoom.PvP && playerOrder == PlayerOrder.Player2)
+        {
+            return (int)playerOrder + 1; 
+        }
+        
+        return (int)playerOrder;
         
     }
     
