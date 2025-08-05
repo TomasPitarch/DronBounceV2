@@ -15,9 +15,6 @@ public interface IRoomService
     public TypeOfRoom GetTypeOfRoom();
     public AuthenticateResponse AuthenticateName(string playerName)
     {
-        var auxiliar = PhotonNetwork.PlayerList;
-        Debug.Log("Autenticacion");
-        
         if (PhotonNetwork.PlayerList.ToList().Any(player => player.NickName.Normalize() == playerName.Normalize()))
         {
             return AuthenticateResponse.NameAlreadyExists;

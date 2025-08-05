@@ -3,17 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using Photon.Pun;
 using Photon.Realtime;
-using UnityEngine;
-
 
 public class PhotonRoomService : MonoBehaviourPunCallbacks,IRoomService
 { 
+    public static PhotonRoomService Instance{ get; private set;}
+    
     private readonly Dictionary<int,string> _players = new();
 
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
     public void  Start()
     {
         PhotonNetwork.AddCallbackTarget(this);
-        DontDestroyOnLoad(this);
     }
     #region IRoomService
     
