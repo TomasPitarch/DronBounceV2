@@ -66,6 +66,21 @@ MonoBehaviour:
   - BallReleaseRPC
   - CollisionEffectRPC
   - InitRPC
+  - RegisterPlayerRPC
+  - RefreshScoresRPC
+  - SetLoserClientRPC
+  - SetWinnerClientRPC
+  - LightsOnScore
+  - EndTriggerRPC
+  - LightsOnScoreRPC
+  - SetGameModeRPC
+  - SetAllVsAllHudRPC
+  - SetPvPHudRPC
+  - ScoreGoalRPC
+  - SpawnPlayerRPC
+  - SetPlayersInHudRPC
+  - SetPlayerInHudRPC
+  - InjectDependenciesRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
