@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 2863715311058998057}
+  ballBus: {fileID: 11400000, guid: 2f66be81ca1fedd41a4f33fc5d2eb0fb, type: 2}
 --- !u!114 &8456541184616918690
 MonoBehaviour:
   m_ObjectHideFlags: 0
