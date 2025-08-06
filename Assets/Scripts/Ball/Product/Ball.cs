@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using Photon.Pun;
-using UnityEngine.Pool;
 using Zenject;
 
 public class Ball : MonoBehaviourPun,IPoolable
@@ -25,27 +24,59 @@ public class Ball : MonoBehaviourPun,IPoolable
         _ballData = ballData;
         _sparkObjectPool = sparkObjectPool;
     }
-  
+    
+    #region MonoBehaviour
+
     private void Awake()
     {
-        if(!PhotonNetwork.IsMasterClient)
-        {
-            SphereCollider collider = GetComponent<SphereCollider>();
-            if(collider!=null)
-            {
-                Destroy(GetComponent<SphereCollider>());
-            }
-            
-        }
         ballBus.SendInstantiateBall(this);
     }
+    
+    private void OnCollisionEnter(Collision collision)
+    {
+        CollisionEffect();
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        if (!collision.gameObject.CompareTag("Floor")) return;
+        _rigidbody.linearVelocity = _rigidbody.linearVelocity.normalized * _ballData.initialForce;
+        _rigidbody.constraints = RigidbodyConstraints.FreezePositionY;
+        transform.position = new Vector3(transform.position.x, 0.25f, transform.position.z);
+    }
+
+    #endregion
+
+    #region RPCs
+   
+    [PunRPC]
+    private void BallReleaseRPC()
+    {
+        BallRelease();
+    }
+    
+    [PunRPC]
+    private void BallInitRPC()
+    {
+        gameObject.SetActive(true); 
+    }
+    
+    #endregion
+
+    #region IPoolable
+
+    public void OnRelease()
+    {
+        gameObject.SetActive(false);
+    }
+
+    #endregion
    
     public void Init(Vector3 startPosition)
     {
         gameObject.transform.position = startPosition;
         _rigidbody.constraints = RigidbodyConstraints.None;
         _rigidbody.linearVelocity = (GetRandomDirection() * _ballData.initialForce);
-        gameObject.SetActive(true); 
+        photonView.RPC(nameof(BallInitRPC), RpcTarget.All);
     }
     private Vector3 GetRandomDirection()
     {
@@ -57,22 +88,6 @@ public class Ball : MonoBehaviourPun,IPoolable
     public void DestroyBall()
     {
         photonView.RPC(nameof(BallReleaseRPC),RpcTarget.All);  
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        CollisionEffect();
-    }
-    private void OnCollisionExit(Collision collision)
-    {
-        if(!PhotonNetwork.IsMasterClient)
-        {
-            return;
-        }
-
-        if (!collision.gameObject.CompareTag("Floor")) return;
-        _rigidbody.linearVelocity = _rigidbody.linearVelocity.normalized * _ballData.initialForce;
-        _rigidbody.constraints = RigidbodyConstraints.FreezePositionY;
-        transform.position = new Vector3(transform.position.x, 0.25f, transform.position.z);
     }
     private void BallRelease()
     {
@@ -102,21 +117,6 @@ public class Ball : MonoBehaviourPun,IPoolable
             return spark;
         }
     }
-
-    #region RPCs
-   
-    [PunRPC]
-    private void BallReleaseRPC()
-    {
-        BallRelease();
-    }
-    
-    #endregion
-
-
-    public void OnRelease()
-    {
-        gameObject.SetActive(false);
-    }
+  
 }
 
