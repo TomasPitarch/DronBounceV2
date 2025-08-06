@@ -81,6 +81,9 @@ MonoBehaviour:
   - SetPlayersInHudRPC
   - SetPlayerInHudRPC
   - InjectDependenciesRPC
+  - BallInitRPC
+  - StartCountDownRPC
+  - ClientReadyRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
