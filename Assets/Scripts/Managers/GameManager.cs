@@ -4,6 +4,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Zenject;
 
 public class GameManager : MonoBehaviourPunCallbacks,IObservable<GameState>
@@ -30,6 +31,8 @@ public class GameManager : MonoBehaviourPunCallbacks,IObservable<GameState>
     private IRoomService _roomService;
     private HudPresenter _hudPresenter;
     
+    private int _playersCounter=0;
+    
     [Inject]
     public void Initialize(IRoomService roomService,BallManager ballManager, HudPresenter hudPresenter)
     {
@@ -53,14 +56,22 @@ public class GameManager : MonoBehaviourPunCallbacks,IObservable<GameState>
     
     private void Start()
     {
+        photonView.RPC(nameof(ClientReadyRPC), RpcTarget.All);
         if (!PhotonNetwork.IsMasterClient)
         {
             return;
         }
         myScoreManager.OnLose += PlayerLose;
-        StartGame();
+        InitialSetup();
     }
-  
+
+    private void InitialSetup()
+    {
+        photonView.RPC(nameof(SetGameModeRPC), RpcTarget.All);
+        RegisterPlayers();
+        InitScores();
+    }
+
     #region RPC
 
     [PunRPC]
@@ -90,9 +101,28 @@ public class GameManager : MonoBehaviourPunCallbacks,IObservable<GameState>
     {
         _hudPresenter.SetPlayerInHud(playerOrder,player);
     }
+    
+    [PunRPC]
+    private void StartCountDownRPC()
+    {
+        freezeCounter.StartCounter(5);
+    }
+
+    [PunRPC]
+    private void ClientReadyRPC()
+    {
+        _playersCounter++;
+        ReadyCheck();
+    }
 
     #endregion
 
+    private async void StartGame()
+    {
+        photonView.RPC(nameof(StartCountDownRPC), RpcTarget.All);
+        await UniTask.Delay(TimeSpan.FromSeconds(4.75));
+        NotifyGameStart();
+    }
     private void SetGameMode()
     {
         switch (_roomService.GetTypeOfRoom())
@@ -129,25 +159,13 @@ public class GameManager : MonoBehaviourPunCallbacks,IObservable<GameState>
             EndGame();
         }
     }
-
-    private async void StartGame()
+    private void ReadyCheck()
     {
-        try
+        if (_playersCounter == _roomService.GetTypeOfRoom().ToNumberOfPlayers())
         {
-            photonView.RPC(nameof(SetGameModeRPC), RpcTarget.All);
-            RegisterPlayers();
-            NotifyGameStart();
-            InitScores();
-            await freezeCounter.StartCounter(5);
-            //TODO:subscribe score manager to listen the start notify
-           
-        }
-        catch (Exception e)
-        {
-            throw e; // TODO handle exception
+            StartGame();
         }
     }
-
     private void InitScores()
     {
         foreach (var valuePair in _playersOrders)
