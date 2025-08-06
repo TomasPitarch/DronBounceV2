@@ -6,6 +6,8 @@ public class RoomPresenter
     private readonly IRoomService _roomService;
     private readonly ISceneManagerService _sceneManagerService;
     
+    private bool _isServer=false;
+    
 
     public RoomPresenter(RoomView roomView,IRoomService roomService,ISceneManagerService sceneManagerService)
     {
@@ -16,7 +18,7 @@ public class RoomPresenter
         _roomService=roomService;
 
         _roomService.OnPlayerListUpdate += PlayersUpdate;
-        _roomService.OnBecomeServer += EnableStartCapabilities;
+        _roomService.OnBecomeServer += SetClientAsServer;
 
         _sceneManagerService = sceneManagerService;
     }
@@ -27,14 +29,24 @@ public class RoomPresenter
         _roomView.SetTypeOfRoom(_roomService.GetTypeOfRoom());
     }
 
-    private void EnableStartCapabilities()
+    private void SetClientAsServer()
     {
-        _roomView.EnableStartButton();
+        _isServer = true;
+        _roomView.ActiveStartButton();
     }
 
     private void PlayersUpdate(List<string> players)
     {
-        _roomView.SetPlayersNames(players);
+       _roomView.SetPlayersNames(players);
+       int numberOfPlayers = _roomService.GetTypeOfRoom().ToNumberOfPlayers();
+       if ( _isServer && players.Count == numberOfPlayers)
+       {
+            _roomView.EnableStartButton();
+       }
+       else
+       {
+           _roomView.DisableStartButton();
+       }
     }
 
     private void StartGame()

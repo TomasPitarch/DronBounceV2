@@ -63,10 +63,20 @@ public class RoomView :ScreenUI
         roomName.text=string.Format(LobbyNameString,newRoomName);
     }
     
-    public void EnableStartButton()
+    public void ActiveStartButton()
     {
         startButton.gameObject.SetActive(true);
+        startButton.interactable = false;
     }
+    public void DisableStartButton()
+    {
+        startButton.interactable = false;
+    }
+    public void EnableStartButton()
+    {
+        startButton.interactable = true;
+    }
+    
 
     public void SetTypeOfRoom(TypeOfRoom getTypeOfRoom)
     {
