@@ -58,5 +58,9 @@ public class LoginView : ScreenUI
     {
         return textNickName.text;
     }
-    
+
+    public void SetNickName(string getLastNickName)
+    {
+        textNickName.text= getLastNickName;
+    }
 }

@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
 
 public class PhotonRoomService : MonoBehaviourPunCallbacks,IRoomService
 { 
     public static PhotonRoomService Instance{ get; private set;}
     
     private readonly Dictionary<int,string> _players = new();
+
+    private string _lastNickName;
+     
 
     private void Awake()
     {
@@ -19,6 +23,8 @@ public class PhotonRoomService : MonoBehaviourPunCallbacks,IRoomService
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        
+        _lastNickName = PlayerPrefs.GetString(PlayerPrefsKeys.LastNickName, "");
     }
     public void  Start()
     {
@@ -39,7 +45,6 @@ public class PhotonRoomService : MonoBehaviourPunCallbacks,IRoomService
     {
         return PhotonNetwork.CurrentRoom.MaxPlayers.ToTypeOfRoom();
     }
-
    
     public AuthenticateResponse AuthenticateName(string playerName)
     {
@@ -51,11 +56,18 @@ public class PhotonRoomService : MonoBehaviourPunCallbacks,IRoomService
         {
             PhotonNetwork.NickName = playerName;
             photonView.RPC(nameof(RegisterPlayerRPC),RpcTarget.MasterClient,PhotonNetwork.LocalPlayer.ActorNumber,playerName);
+            PlayerPrefs.SetString(PlayerPrefsKeys.LastNickName, playerName);
+            _lastNickName = playerName;
             
             return AuthenticateResponse.Accepted;
         }
     }
-    
+
+    public string GetLastNickName()
+    {
+        return _lastNickName;
+    }
+
     #endregion
 
     #region MonoBehaviourPunCallbacks
