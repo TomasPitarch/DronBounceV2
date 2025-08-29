@@ -25,5 +25,7 @@ public interface IRoomService
            return AuthenticateResponse.Accepted;
         }
     }
+
+    public string GetLastNickName();
 }
     

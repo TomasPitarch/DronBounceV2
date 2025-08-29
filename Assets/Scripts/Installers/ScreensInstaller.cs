@@ -16,12 +16,21 @@ public class ScreensInstaller : MonoInstaller
     [SerializeField]
     private LobbyView lobbyView;
     
+    [SerializeField]
+    private PopUpManager popUpManager;
+    
     public override void InstallBindings()
     {
         BindInitialConnect();
         BindLogin();
         BindLobby();
         BindRoom();
+        BindPopUp();
+    }
+
+    private void BindPopUp()
+    {
+        Container.Bind<IPopUpManager>().FromInstance(popUpManager).AsSingle();
     }
 
     private void BindRoom()
